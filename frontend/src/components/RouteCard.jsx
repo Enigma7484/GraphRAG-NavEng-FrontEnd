@@ -4,7 +4,9 @@ export default function RouteCard({ route, compact = false }) {
       <div className="route-card-top">
         <div>
           <div className="route-rank">Route #{route.rank}</div>
-          <div className="route-score">Score {route.score.toFixed(3)}</div>
+          <div className="route-score">
+            Combined {route.combined_score.toFixed(3)}
+          </div>
         </div>
 
         <div className="route-distance">{route.distance_km.toFixed(2)} km</div>
@@ -19,10 +21,24 @@ export default function RouteCard({ route, compact = false }) {
       </div>
 
       <div className="route-metrics">
+        <MiniMetric
+          label="Profile"
+          value={
+            route.profile_score !== null && route.profile_score !== undefined
+              ? route.profile_score.toFixed(3)
+              : "N/A"
+          }
+        />
+        <MiniMetric
+          label="SBERT"
+          value={
+            route.sbert_score !== null && route.sbert_score !== undefined
+              ? route.sbert_score.toFixed(3)
+              : "N/A"
+          }
+        />
         <MiniMetric label="Park" value={`${route.park_near_pct.toFixed(1)}%`} />
-        <MiniMetric label="Safety" value={route.safety_score.toFixed(2)} />
-        <MiniMetric label="Turns" value={route.turns} />
-        <MiniMetric label="Major" value={`${route.major_pct.toFixed(1)}%`} />
+        <MiniMetric label="Safety" value={`${route.safety_score.toFixed(1)}/100`} />
       </div>
 
       <p className="route-summary">{route.summary}</p>
