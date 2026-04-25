@@ -60,7 +60,7 @@ export default function App() {
     "Nathan Phillips Square, Toronto, Canada"
   );
   const [preference, setPreference] = useState(PRESETS[0].value);
-  const [userId, setUserId] = useState("omar_demo");
+  const [userId, setUserId] = useState("geolife_000");
   const [requestDatetime, setRequestDatetime] = useState("2026-04-07T18:15:00");
   const [rankingMode, setRankingMode] = useState("prompt");
 
@@ -249,7 +249,7 @@ export default function App() {
               <input
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="e.g. omar_demo"
+                placeholder="e.g. geolife_000"
               />
 
               <label>Request Datetime</label>
