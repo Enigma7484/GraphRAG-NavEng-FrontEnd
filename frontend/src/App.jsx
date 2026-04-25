@@ -62,7 +62,7 @@ export default function App() {
   const [preference, setPreference] = useState(PRESETS[0].value);
   const [userId, setUserId] = useState("omar_demo");
   const [requestDatetime, setRequestDatetime] = useState("2026-04-07T18:15:00");
-  const [rankingMode, setRankingMode] = useState("profile");
+  const [rankingMode, setRankingMode] = useState("prompt");
 
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -127,10 +127,16 @@ export default function App() {
 
       const res = await axios.post(`${API_BASE}/rank-routes`, payload);
 
-      const enriched = (res.data.routes || []).map((route) => ({
-        ...route,
-        badges: inferBadges(route),
-      }));
+      const enriched = (res.data.routes || []).map((route) => {
+        const normalized = {
+          ...route,
+          combined_score: Number(route.combined_score ?? route.score ?? 0),
+          profile_score: route.profile_score ?? null,
+          sbert_score: route.sbert_score ?? null,
+          coordinates: Array.isArray(route.coordinates) ? route.coordinates : [],
+        };
+        return { ...normalized, badges: inferBadges(normalized) };
+      });
 
       setRoutes(enriched);
       setProfileSummary(res.data.profile_summary || "");
@@ -138,10 +144,8 @@ export default function App() {
       setResponseMode(res.data.ranking_mode || "");
     } catch (err) {
       console.error(err);
-      setError(
-        err?.response?.data?.detail ||
-          "Failed to fetch ranked routes. Make sure the backend is running."
-      );
+      const detail = err?.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : Array.isArray(detail) ? detail.map((d) => d?.msg || JSON.stringify(d)).join(" | ") : "Failed to fetch ranked routes. Make sure the backend is running and the selected ranking mode has the required inputs.");
     } finally {
       setLoading(false);
     }
