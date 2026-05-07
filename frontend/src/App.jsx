@@ -53,6 +53,13 @@ function inferBadges(route) {
 }
 
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("georoute-theme");
+    if (savedTheme) return savedTheme;
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  });
   const [origin, setOrigin] = useState(
     "University of Toronto, Toronto, Canada"
   );
@@ -78,6 +85,11 @@ export default function App() {
   const startedAtRef = useRef(null);
 
   const selectedRoute = routes[selectedRouteIdx] || null;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("georoute-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     if (loading) {
@@ -178,10 +190,23 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
-          <div className="brand-badge">GeoRoute</div>
+          <div className="brand-topline">
+            <div className="brand-badge">GeoRoute</div>
+            <button
+              type="button"
+              className="theme-toggle"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+            >
+              <span>{theme === "dark" ? "☀" : "☾"}</span>
+              {theme === "dark" ? "Light" : "Dark"}
+            </button>
+          </div>
           <h1>Preference-Based Route Ranking</h1>
           <p>
-            Dynamic route ranking with prompt, profile, or hybrid personalization.
+            Compare route options through prompt, profile, and hybrid
+            personalization with fast visual feedback.
           </p>
         </div>
 
@@ -380,7 +405,11 @@ export default function App() {
               </span>
             </div>
             <div className="map-frame">
-              <MapView routes={routes} selectedRouteIdx={selectedRouteIdx} />
+              <MapView
+                routes={routes}
+                selectedRouteIdx={selectedRouteIdx}
+                theme={theme}
+              />
             </div>
           </section>
 

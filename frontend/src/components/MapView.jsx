@@ -14,9 +14,10 @@ function MapAutoFit({ routes, selectedRouteIdx }) {
   return null;
 }
 
-export default function MapView({ routes, selectedRouteIdx }) {
+export default function MapView({ routes, selectedRouteIdx, theme = "light" }) {
   const fallbackCenter = [43.6532, -79.3832];
   const selectedRoute = routes?.[selectedRouteIdx];
+  const isDark = theme === "dark";
 
   return (
     <MapContainer
@@ -26,8 +27,12 @@ export default function MapView({ routes, selectedRouteIdx }) {
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+        url={
+          isDark
+            ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        }
       />
 
       <MapAutoFit routes={routes} selectedRouteIdx={selectedRouteIdx} />
@@ -39,9 +44,9 @@ export default function MapView({ routes, selectedRouteIdx }) {
             key={idx}
             positions={route.coordinates}
             pathOptions={{
-              color: isSelected ? "#ef4444" : "#3b82f6",
+              color: isSelected ? (isDark ? "#f97316" : "#ef4444") : (isDark ? "#38bdf8" : "#2563eb"),
               weight: isSelected ? 6 : 4,
-              opacity: isSelected ? 0.95 : 0.35,
+              opacity: isSelected ? 0.95 : 0.42,
             }}
           />
         );
