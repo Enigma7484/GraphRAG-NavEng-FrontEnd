@@ -4,6 +4,7 @@ import MapView from "./components/MapView";
 import RouteCard from "./components/RouteCard";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const SESSION_RESULTS_KEY = "georoute-session-results";
 
 const PRESETS = [
   {
@@ -61,7 +62,7 @@ export default function App() {
       : "light";
   });
   const [origin, setOrigin] = useState(
-    "University of Toronto, Toronto, Canada"
+    "University of Toronto St George Campus, Toronto, Canada"
   );
   const [destination, setDestination] = useState(
     "Nathan Phillips Square, Toronto, Canada"
@@ -80,6 +81,13 @@ export default function App() {
   const [profileSummary, setProfileSummary] = useState("");
   const [responseContext, setResponseContext] = useState(null);
   const [responseMode, setResponseMode] = useState("");
+  const [modeResults, setModeResults] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(SESSION_RESULTS_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  });
 
   const timerRef = useRef(null);
   const startedAtRef = useRef(null);
@@ -90,6 +98,38 @@ export default function App() {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("georoute-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_RESULTS_KEY, JSON.stringify(modeResults));
+  }, [modeResults]);
+
+  useEffect(() => {
+    const cached = modeResults[rankingMode];
+    if (!cached) return;
+
+    setRoutes(cached.routes || []);
+    setSelectedRouteIdx(cached.selectedRouteIdx || 0);
+    setProfileSummary(cached.profileSummary || "");
+    setResponseContext(cached.responseContext || null);
+    setResponseMode(cached.responseMode || rankingMode);
+    setError("");
+  }, [modeResults, rankingMode]);
+
+  useEffect(() => {
+    if (!responseMode) return;
+
+    setModeResults((current) => {
+      const cached = current[responseMode];
+      if (!cached || cached.selectedRouteIdx === selectedRouteIdx) return current;
+      return {
+        ...current,
+        [responseMode]: {
+          ...cached,
+          selectedRouteIdx,
+        },
+      };
+    });
+  }, [responseMode, selectedRouteIdx]);
 
   useEffect(() => {
     if (loading) {
@@ -113,11 +153,6 @@ export default function App() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setRoutes([]);
-    setSelectedRouteIdx(0);
-    setProfileSummary("");
-    setResponseContext(null);
-    setResponseMode("");
 
     try {
       const payload = {
@@ -150,10 +185,23 @@ export default function App() {
         return { ...normalized, badges: inferBadges(normalized) };
       });
 
-      setRoutes(enriched);
-      setProfileSummary(res.data.profile_summary || "");
-      setResponseContext(res.data.context || null);
-      setResponseMode(res.data.ranking_mode || "");
+      const result = {
+        routes: enriched,
+        selectedRouteIdx: 0,
+        profileSummary: res.data.profile_summary || "",
+        responseContext: res.data.context || null,
+        responseMode: res.data.ranking_mode || rankingMode,
+      };
+
+      setRoutes(result.routes);
+      setSelectedRouteIdx(result.selectedRouteIdx);
+      setProfileSummary(result.profileSummary);
+      setResponseContext(result.responseContext);
+      setResponseMode(result.responseMode);
+      setModeResults((current) => ({
+        ...current,
+        [rankingMode]: result,
+      }));
     } catch (err) {
       console.error(err);
       const detail = err?.response?.data?.detail;
