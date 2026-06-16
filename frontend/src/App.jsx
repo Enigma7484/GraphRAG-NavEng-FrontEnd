@@ -68,9 +68,9 @@ export default function App() {
     "Nathan Phillips Square, Toronto, Canada"
   );
   const [preference, setPreference] = useState(PRESETS[0].value);
-  const [userId, setUserId] = useState("geolife_000");
-  const [requestDatetime, setRequestDatetime] = useState("2026-04-07T18:15:00");
-  const [rankingMode, setRankingMode] = useState("prompt");
+  const [userId, setUserId] = useState("osm_trace_toronto");
+  const [requestDatetime, setRequestDatetime] = useState("2026-06-16T09:30:00-04:00");
+  const [rankingMode, setRankingMode] = useState("hybrid");
 
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -322,7 +322,7 @@ export default function App() {
               <input
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="e.g. geolife_000"
+                placeholder="e.g. osm_trace_toronto"
               />
 
               <label>Request Datetime</label>
