@@ -1,6 +1,23 @@
-# React + Vite
+# MyWay Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive React/Vite client for the MyWay preference-aware route-ranking engine.
+
+## Run locally
+
+```bash
+npm install
+VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev
+```
+
+`VITE_API_BASE_URL` may include a trailing slash; the client normalizes it before requesting `/rank-routes`.
+
+## Build
+
+```bash
+npm run build
+```
+
+## Vite notes
 
 Currently, two official plugins are available:
 

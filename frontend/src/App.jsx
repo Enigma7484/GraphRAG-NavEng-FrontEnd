@@ -3,8 +3,11 @@ import axios from "axios";
 import MapView from "./components/MapView";
 import RouteCard from "./components/RouteCard";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
-const SESSION_RESULTS_KEY = "georoute-session-results";
+const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
+const SESSION_RESULTS_KEY = "myway-session-results";
+const LEGACY_SESSION_RESULTS_KEY = "georoute-session-results";
 
 const PRESETS = [
   {
@@ -55,7 +58,9 @@ function inferBadges(route) {
 
 export default function App() {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem("georoute-theme");
+    const savedTheme =
+      localStorage.getItem("myway-theme") ||
+      localStorage.getItem("georoute-theme");
     if (savedTheme) return savedTheme;
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -83,7 +88,11 @@ export default function App() {
   const [responseMode, setResponseMode] = useState("");
   const [modeResults, setModeResults] = useState(() => {
     try {
-      return JSON.parse(sessionStorage.getItem(SESSION_RESULTS_KEY) || "{}");
+      return JSON.parse(
+        sessionStorage.getItem(SESSION_RESULTS_KEY) ||
+          sessionStorage.getItem(LEGACY_SESSION_RESULTS_KEY) ||
+          "{}"
+      );
     } catch {
       return {};
     }
@@ -96,7 +105,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem("georoute-theme", theme);
+    localStorage.setItem("myway-theme", theme);
   }, [theme]);
 
   useEffect(() => {
@@ -239,7 +248,7 @@ export default function App() {
       <aside className="sidebar">
         <div className="brand-block">
           <div className="brand-topline">
-            <div className="brand-badge">GeoRoute</div>
+            <div className="brand-badge">MyWay</div>
             <button
               type="button"
               className="theme-toggle"
@@ -251,7 +260,7 @@ export default function App() {
               {theme === "dark" ? "Light" : "Dark"}
             </button>
           </div>
-          <h1>Preference-Based Route Ranking</h1>
+          <h1>Routes that fit how you move</h1>
           <p>
             Compare route options through prompt, profile, and hybrid
             personalization with fast visual feedback.
@@ -261,7 +270,7 @@ export default function App() {
         <form onSubmit={handleSubmit} className="panel form-panel">
           <div className="panel-header">
             <h2>Route Query</h2>
-            <span className="panel-tag">FastAPI + React</span>
+            <span className="panel-tag">MyWay Engine</span>
           </div>
 
           <label>Ranking Mode</label>

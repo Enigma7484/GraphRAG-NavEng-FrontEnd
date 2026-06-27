@@ -1,8 +1,9 @@
-# GraphRAG NavEng FrontEnd
-React Front-end for the Python GeoRoute Preference (Fast)API 
+# MyWay Web
+
+React frontend for the MyWay preference-aware route-ranking API.
 ## Overview
 
-GraphRAG NavEng FrontEnd is a React-based interface for the Python GeoRoute Preference (Fast)API. It provides a smooth, interactive experience for exploring route options and applying preference-based navigation rules.
+MyWay is a React interface for comparing route options using prompt, profile, and hybrid preference signals.
 
 ## Features
 
@@ -15,18 +16,18 @@ GraphRAG NavEng FrontEnd is a React-based interface for the Python GeoRoute Pref
 
 1. Clone the repository
 2. Install dependencies:
-    - `npm install`
+    - `cd frontend && npm install`
 3. Start the development server:
-    - `npm start`
+    - `npm run dev`
 
 ## Usage
 
-Open the app in your browser at `http://localhost:3000`, then enter route details and select preferences to generate customized navigation suggestions.
+Open the URL printed by Vite, then enter route details and select preferences to generate personalized route suggestions.
 
 ## Notes
 
-- Ensure the Python GeoRoute Preference (Fast)API backend is running and reachable.
-- Adjust API endpoint configuration as needed in the frontend settings.
+- Ensure the MyWay FastAPI backend is running and reachable.
+- Set `VITE_API_BASE_URL` to the API origin without a path. A trailing slash is accepted and normalized.
 
 ## License
 
